@@ -16,6 +16,7 @@
         height: 100vh;
         width: 100vh;
         border-radius: 50%;
+        border: 10px solid rgba(19, 19, 19);
         overflow: hidden;
         margin: 0 auto;
         max-height: 60vh;
@@ -82,9 +83,22 @@
       .hide {
         display: none;
       }
+      h1{
+          position: absolute;
+          text-align: center;
+          top: 0;
+          width: 100%;
+          font-family: 'Goldman', cursive;
+          font-size: 4rem;
+      }
     </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Goldman&display=swap" rel="stylesheet">
   </head>
   <body>
+        
+    <h1> Nivel <span id="level">1</span></h1>
+    
     <div class="gameboard">
       <div id="celeste" class="color celeste left" data-color="celeste"></div>
       <div id="violeta" class="color violeta right" data-color="violeta"></div>
@@ -98,6 +112,7 @@
       const naranja = document.getElementById('naranja')
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
+      const level = document.getElementById("level");
 
       class Game {
         constructor() {
@@ -121,6 +136,7 @@
         }
         nextLevel(){
             this.lightSequence();
+            level.innerHTML=this.level
         }
         sequenceToColor(num){
             switch(num){
@@ -135,15 +151,16 @@
             }
         }
         
-        lightColour(colour){
-            this.colours[colour].classList.add("light");
-            setTimeout(() => this.turnOffColour(colour),500)
-        }
+       
         lightSequence(){
             for(let i=0;i<this.level;i++){
                 const sequenceColour = this.sequenceToColor(this.sequence[i]);
-                setTimeout(() => this.lightColour(sequenceColour),800*i);
+                setTimeout(() => this.lightColour(sequenceColour),1200*i);
             }
+        }
+        lightColour(colour){
+            this.colours[colour].classList.add("light");
+            setTimeout(() => this.turnOffColour(colour),700)
         }
         turnOffColour(colour){
             this.colours[colour].classList.remove("light");
