@@ -90,7 +90,7 @@
       <div id="violeta" class="color violeta right" data-color="violeta"></div>
       <div id="naranja" class="color naranja left" data-color="naranja"></div>
       <div id="verde" class="color verde right" data-color="verde"></div>
-      <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+      <button id="btnEmpezar" class="btn-start" onclick="startGame()">Empezar a jugar!</button>
     </div>
     <script>
       const celeste = document.getElementById('celeste')
@@ -99,18 +99,59 @@
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
 
-      class Juego {
+      class Game {
         constructor() {
-          this.inicializar()
+          this.initialize()
+          this.generateSequence()
+          this.nextLevel()
         }
 
-        inicializar() {
+        initialize() {
           btnEmpezar.classList.add('hide')
+          this.level = 1;
+          this.colours = {
+              celeste,
+              violeta,
+              naranja,
+              verde
+          }
+        }
+        generateSequence(){
+            this.sequence = new Array(10).fill(0).map(x => Math.floor(Math.random()*4))//genero un array de 10 posiciones que es la secuencia (entre 0 y 3 que son los 4 colores)
+        }
+        nextLevel(){
+            this.lightSequence();
+        }
+        sequenceToColor(num){
+            switch(num){
+                case 0:
+                    return "celeste"
+                case 1:
+                    return "violeta"
+                case 2:
+                    return "naranja"
+                case 3:
+                    return "verde"
+            }
+        }
+        
+        lightColour(colour){
+            this.colours[colour].classList.add("light");
+            setTimeout(() => this.turnOffColour(colour),500)
+        }
+        lightSequence(){
+            for(let i=0;i<this.level;i++){
+                const sequenceColour = this.sequenceToColor(this.sequence[i]);
+                setTimeout(() => this.lightColour(sequenceColour),800*i);
+            }
+        }
+        turnOffColour(colour){
+            this.colours[colour].classList.remove("light");
         }
       }
 
-      function empezarJuego() {
-        var juego = new Juego()
+      function startGame() {
+        window.game = new Game()
       }
     </script>
   </body>
