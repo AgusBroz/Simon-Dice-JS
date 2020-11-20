@@ -113,12 +113,13 @@
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
       const level = document.getElementById("level");
+      const LAST_LEVEL = 10;
 
       class Game {
         constructor() {
           this.initialize()
           this.generateSequence()
-          this.nextLevel()
+          setTimeout(this.nextLevel.call(this),1000);
         }
 
         initialize() {
@@ -130,15 +131,20 @@
               naranja,
               verde
           }
+          this.chooseColour = this.chooseColour.bind(this) //para que siempre el entorno de this sea el de la clase, ya que lo estoy 
+          //llamando dentro de la addClickEvents
+          this.nextLevel = this.nextLevel.bind(this)
         }
         generateSequence(){
-            this.sequence = new Array(10).fill(0).map(x => Math.floor(Math.random()*4))//genero un array de 10 posiciones que es la secuencia (entre 0 y 3 que son los 4 colores)
+            this.sequence = new Array(LAST_LEVEL).fill(0).map(x => Math.floor(Math.random()*4))//genero un array de 10 posiciones que es la secuencia (entre 0 y 3 que son los 4 colores)
         }
         nextLevel(){
-            this.lightSequence();
-            level.innerHTML=this.level
+          this.sublevel = 0;
+          this.lightSequence()
+          level.innerHTML=this.level
+          this.addClickEvents();
         }
-        sequenceToColor(num){
+        sequenceToColour(num){
             switch(num){
                 case 0:
                     return "celeste"
@@ -150,20 +156,68 @@
                     return "verde"
             }
         }
-        
-       
-        lightSequence(){
-            for(let i=0;i<this.level;i++){
-                const sequenceColour = this.sequenceToColor(this.sequence[i]);
-                setTimeout(() => this.lightColour(sequenceColour),1200*i);
+        colourToSequence(num){
+            switch(num){
+                case "celeste":
+                    return 0
+                case "violeta":
+                    return 1
+                case "naranja":
+                    return 2
+                case "verde":
+                    return 3
             }
         }
-        lightColour(colour){
+        lightSequence(){
+            for(let i=0;i<this.level;i++){
+                let sequenceColour = this.sequenceToColour(this.sequence[i]);
+                setTimeout(() => this.lightColour(sequenceColour),700*i);
+            }
+        }
+        lightColour(colour){ //recibe un string
             this.colours[colour].classList.add("light");
-            setTimeout(() => this.turnOffColour(colour),700)
+            for(let p in this.colours){ //en p se almacena el nombre de la propiedad
+              if(p !== colour)
+                this.colours[p].classList.remove("light");
+            }
+            setTimeout(() => this.turnOffColour(colour),500)
         }
         turnOffColour(colour){
             this.colours[colour].classList.remove("light");
+        }
+        addClickEvents(){
+          this.colours.celeste.addEventListener('click',this.chooseColour)
+          this.colours.naranja.addEventListener('click',this.chooseColour)
+          this.colours.verde.addEventListener('click',this.chooseColour)
+          this.colours.violeta.addEventListener('click',this.chooseColour)
+        }
+        removeClickEvents(){
+          this.colours.celeste.removeEventListener('click',this.chooseColour)
+          this.colours.naranja.removeEventListener('click',this.chooseColour)
+          this.colours.verde.removeEventListener('click',this.chooseColour)
+          this.colours.violeta.removeEventListener('click',this.chooseColour)
+        }
+        chooseColour(ev){
+          const colour = ev.target.dataset.color //se almacena el string del color que tocó
+          //debugger
+          const colourNum = this.colourToSequence(colour);
+
+          this.lightColour(colour)
+          if(colourNum === this.sequence[this.sublevel]){
+            this.sublevel++;
+            if(this.sublevel == this.level){
+              this.level++;
+              this.removeClickEvents();
+              if(this.level == LAST_LEVEL + 1)
+                console.log("YOU HAVE WONNN") //win behaviour
+              else
+                setTimeout(this.nextLevel,1000);           
+            }
+          }
+          else{
+              console.log("YOU HAVE LOST")
+              //lost behaviour
+            }
         }
       }
 
