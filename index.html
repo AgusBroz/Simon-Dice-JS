@@ -205,7 +205,7 @@
           }
         }
         lightColour(colour){ //recibe un string
-          //this.sounds[colour].play()
+          this.sounds[colour].play()
           this.colours[colour].classList.add("light");
           for(let p in this.colours){ //en p se almacena el nombre de la propiedad
             if(p !== colour)
