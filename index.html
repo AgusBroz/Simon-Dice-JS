@@ -116,6 +116,10 @@
       <div id="naranja" class="color naranja left" data-color="naranja"></div>
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="startGame()">Empezar a jugar!</button>
+      <audio id="do-sound" src="sound/do.wav"></audio>
+      <audio id="re-sound" src="sound/re.wav"></audio>
+      <audio id="mi-sound" src="sound/mi.wav"></audio>
+      <audio id="sol-sound" src="sound/sol.wav"></audio>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" 
     integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous"></script>
@@ -126,12 +130,20 @@
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
       const level = document.getElementById("level");
+      const do_sound = document.getElementById("do-sound");
+      const re_sound = document.getElementById("re-sound");
+      const mi_sound = document.getElementById("mi-sound");
+      const sol_sound = document.getElementById("sol-sound");
       const LAST_LEVEL = 10;
 
       class Game {
         constructor() {
+          this.initialize = this.initialize.bind(this)
           this.initialize()
           this.generateSequence()
+          this.nextLevel = this.nextLevel.bind(this)
+          this.chooseColour = this.chooseColour.bind(this) //para que siempre el entorno de this sea el de la clase, ya que lo estoy 
+          //llamando dentro de la addClickEvents
           setTimeout(this.nextLevel.call(this),1000);
         }
 
@@ -144,9 +156,12 @@
               naranja,
               verde
           }
-          this.chooseColour = this.chooseColour.bind(this) //para que siempre el entorno de this sea el de la clase, ya que lo estoy 
-          //llamando dentro de la addClickEvents
-          this.nextLevel = this.nextLevel.bind(this)
+          this.sounds = {
+            celeste: do_sound,
+            violeta: re_sound,
+            naranja: mi_sound,
+            verde: sol_sound
+          }          
         }
         generateSequence(){
             this.sequence = new Array(LAST_LEVEL).fill(0).map(x => Math.floor(Math.random()*4))//genero un array de 10 posiciones que es la secuencia (entre 0 y 3 que son los 4 colores)
@@ -155,7 +170,8 @@
           this.sublevel = 0;
           this.lightSequence()
           level.innerHTML=this.level
-          this.addClickEvents();
+          setTimeout(this.addClickEvents.bind(this),700*this.level)
+         // this.addClickEvents()
         }
         sequenceToColour(num){
             switch(num){
@@ -182,18 +198,20 @@
             }
         }
         lightSequence(){
-            for(let i=0;i<this.level;i++){
-                let sequenceColour = this.sequenceToColour(this.sequence[i]);
-                setTimeout(() => this.lightColour(sequenceColour),700*i);
-            }
+          setTimeout(() => this.canLose = true, 700*this.level)
+          for(let i=0;i<this.level;i++){
+            let sequenceColour = this.sequenceToColour(this.sequence[i]);
+            setTimeout(() => this.lightColour(sequenceColour),700*i);
+          }
         }
         lightColour(colour){ //recibe un string
-            this.colours[colour].classList.add("light");
-            for(let p in this.colours){ //en p se almacena el nombre de la propiedad
-              if(p !== colour)
-                this.colours[p].classList.remove("light");
-            }
-            setTimeout(() => this.turnOffColour(colour),500)
+          //this.sounds[colour].play()
+          this.colours[colour].classList.add("light");
+          for(let p in this.colours){ //en p se almacena el nombre de la propiedad
+            if(p !== colour)
+              this.colours[p].classList.remove("light");
+          }
+          setTimeout(() => this.turnOffColour(colour),500)
         }
         turnOffColour(colour){
             this.colours[colour].classList.remove("light");
@@ -223,8 +241,9 @@
               this.removeClickEvents();
               if(this.level == LAST_LEVEL + 1)
                 this.winGame() //win behaviour
-              else
+              else{
                 setTimeout(this.nextLevel,1000);           
+              }
             }
           }
           else{
@@ -240,7 +259,9 @@
           .then(() => { 
             this.initialize() 
             this.removeClickEvents()
+           // debugger
             }) 
+           
         }
       }
       function startGame() {
