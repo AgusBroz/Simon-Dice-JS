@@ -94,21 +94,30 @@
       .hide {
         display: none;
       }
-      h1{
+      .game-data{
           position: absolute;
           text-align: center;
           top: 0;
           width: 100%;
           font-family: 'Goldman', cursive;
-          font-size: 4rem;
+      }
+      .game-data h1{
+        font-size: 4rem;
+        margin: 0
+      }
+      .game-data h2{
+        font-size: 2rem;
+        margin: 0;
       }
     </style>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Acme&family=Goldman&display=swap" rel="stylesheet">
   </head>
   <body>
-        
-    <h1> Nivel <span id="level">1</span></h1>
+    <div class="game-data">
+      <h1> Nivel <span id="level">1</span></h1>
+      <h2> Maxima Puntuación: <span id="max-punt">0</span></h2>
+    </div>
     
     <div class="gameboard">
       <div id="celeste" class="color celeste left" data-color="celeste"></div>
@@ -130,12 +139,16 @@
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
       const level = document.getElementById("level");
+      const maxPuntText = document.getElementById("max-punt")
       const do_sound = document.getElementById("do-sound");
       const re_sound = document.getElementById("re-sound");
       const mi_sound = document.getElementById("mi-sound");
       const sol_sound = document.getElementById("sol-sound");
       const LAST_LEVEL = 10;
-
+      //localStorage.setItem("maxPuntuation", 0)
+      var maxPuntuation = localStorage.getItem("maxPuntuation");
+      maxPuntText.innerHTML = maxPuntuation
+      
       class Game {
         constructor() {
           this.initialize = this.initialize.bind(this)
@@ -161,7 +174,8 @@
             violeta: re_sound,
             naranja: mi_sound,
             verde: sol_sound
-          }          
+          }      
+          maxPuntText.innerHTML = maxPuntuation
         }
         generateSequence(){
             this.sequence = new Array(LAST_LEVEL).fill(0).map(x => Math.floor(Math.random()*4))//genero un array de 10 posiciones que es la secuencia (entre 0 y 3 que son los 4 colores)
@@ -239,16 +253,26 @@
             if(this.sublevel == this.level){
               this.level++;
               this.removeClickEvents();
-              if(this.level == LAST_LEVEL + 1)
+              if(this.level == LAST_LEVEL + 1){
+                if(this.level>maxPuntuation)
+                  this.setMaxPuntuation(this.level-1);
                 this.winGame() //win behaviour
+              }
               else{
-                setTimeout(this.nextLevel,1000);           
+                setTimeout(this.nextLevel,1000);       
               }
             }
           }
-          else{
+          else{//pierde
+            if(this.level>maxPuntuation){
+              this.setMaxPuntuation(this.level-1);
+            }   
             this.loseGame()
           }
+        }
+        setMaxPuntuation(punt){
+          localStorage.setItem('maxPuntuation', punt)
+          maxPuntuation=punt;
         }
         winGame(){
           swal('Simon Dice', 'Feliciaciones, ¡Ganaste!', 'success')
