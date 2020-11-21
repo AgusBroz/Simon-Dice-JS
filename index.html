@@ -5,6 +5,7 @@
     <title>Simon Dice</title>
     <style>
       body {
+        font-family: 'Acme', sans-serif;
         margin: 0;
         background: #dedede;
         display: flex;
@@ -78,6 +79,16 @@
         position: absolute;
         top: calc(50% - 50px);
         left: calc(50% - 200px);
+        border: none;
+        font-family: 'Acme', sans-serif;
+        -webkit-box-shadow: 8px 7px 12px -5px rgba(0,0,0,0.88); 
+        box-shadow: 8px 7px 12px -5px rgba(0,0,0,0.88);
+        transition: box-shadow ease-in-out 0.1s;
+      }
+      .btn-start:hover{
+        transition: box-shadow ease-in-out 0.1s;
+        cursor: pointer;
+        box-shadow: none;
       }
 
       .hide {
@@ -93,7 +104,7 @@
       }
     </style>
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Goldman&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Acme&family=Goldman&display=swap" rel="stylesheet">
   </head>
   <body>
         
@@ -106,6 +117,8 @@
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="startGame()">Empezar a jugar!</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" 
+    integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous"></script>
     <script>
       const celeste = document.getElementById('celeste')
       const violeta = document.getElementById('violeta')
@@ -123,7 +136,7 @@
         }
 
         initialize() {
-          btnEmpezar.classList.add('hide')
+          btnEmpezar.classList.toggle('hide')
           this.level = 1;
           this.colours = {
               celeste,
@@ -209,18 +222,27 @@
               this.level++;
               this.removeClickEvents();
               if(this.level == LAST_LEVEL + 1)
-                console.log("YOU HAVE WONNN") //win behaviour
+                this.winGame() //win behaviour
               else
                 setTimeout(this.nextLevel,1000);           
             }
           }
           else{
-              console.log("YOU HAVE LOST")
-              //lost behaviour
-            }
+            this.loseGame()
+          }
+        }
+        winGame(){
+          swal('Simon Dice', 'Feliciaciones, ¡Ganaste!', 'success')
+          .then(this.initialize)
+        }
+        loseGame(){
+          swal('Simon Dice', 'Ups, Perdiste... :(', 'error')
+          .then(() => { 
+            this.initialize() 
+            this.removeClickEvents()
+            }) 
         }
       }
-
       function startGame() {
         window.game = new Game()
       }
