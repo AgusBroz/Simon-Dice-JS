@@ -1,2 +1,2 @@
 # Simon-Dice-JS
-Juego "Simon Dice" para practica JS Vanilla 
+Juego "Simon Dice" para practicar JS Vanilla 
